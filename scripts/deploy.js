@@ -6,7 +6,9 @@ const main = async () => {
     console.log("Account balance: ", accountBalance.toString());
 
     const coinContractFactory = await hre.ethers.getContractFactory("CoinPortal");
-    const coinContract = await coinContractFactory.deploy();
+    const coinContract = await coinContractFactory.deploy({
+        value: hre.ethers.utils.parseEther("0.1")
+    });
     await coinContract.deployed();
 
     console.log("Coins Wallet address: ", coinContract.address);

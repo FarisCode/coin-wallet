@@ -1,19 +1,37 @@
 const main = async () => {
     const coinContractFactory = await hre.ethers.getContractFactory("CoinPortal");
-    const coinContract = await coinContractFactory.deploy();
+    const coinContract = await coinContractFactory.deploy({
+        value: hre.ethers.utils.parseEther("0.1"),
+    });
     await coinContract.deployed();
 
     console.log("Contract deployed to:", coinContract.address);
 
-    let waveCount = await coinContract.getTotalCoins();
-    console.log(waveCount.toNumber());
+    /*
+        * Get Contract balance
+    */
+    let contractBalance = await hre.ethers.provider.getBalance(
+        coinContract.address
+    );
+    console.log(
+        "Contract balance:",
+        hre.ethers.utils.formatEther(contractBalance)
+    );
+
 
     let coinTxn = await coinContract.sendCoin("Here's a coin for you");
     await coinTxn.wait();
-    
-    const [_, randomPerson] = await hre.ethers.getSigners();
-    coinTxn = await coinContract.connect(randomPerson).sendCoin("Another coin incoming!");
+   
+    coinTxn = await coinContract.sendCoin("Here's another coin for you");
     await coinTxn.wait();
+
+    contractBalance = await hre.ethers.provider.getBalance(
+        coinContract.address
+    );
+    console.log(
+        "Contract balance:",
+        hre.ethers.utils.formatEther(contractBalance)
+    );
 
     let allCoins = await coinContract.getAllCoins();
     console.log(allCoins);
